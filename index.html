@@ -42,21 +42,21 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Game variables
+        // Game variables - EASIER SETTINGS
         let frames = 0;
         let score = 0;
         let highScore = localStorage.getItem('flappyHighScore') || 0;
         let gameState = 'start'; // start, playing, gameover
 
-        // Bird object
+        // Bird object - TUNED FOR BETTER GAMEPLAY
         const bird = {
             x: 50,
             y: 150,
-            width: 30,
+            width: 32,
             height: 24,
             velocity: 0,
-            gravity: 0.5,
-            jump: -8,
+            gravity: 0.35,      // Lighter gravity for easier gameplay
+            jump: -7,           // Stronger initial jump
             
             draw() {
                 ctx.fillStyle = '#FFD700';
@@ -106,11 +106,11 @@
             }
         };
 
-        // Pipes array
+        // Pipes - WIDER GAP for easier gameplay
         const pipes = [];
-        const pipeWidth = 60;
-        const pipeGap = 150;
-        const pipeSpeed = 3;
+        const pipeWidth = 65;
+        const pipeGap = 170;      // Wider gap (was 150)
+        const pipeSpeed = 2.5;    // Slower speed (was 3)
 
         function drawPipe(pipe) {
             ctx.fillStyle = '#2ECC71';
@@ -127,8 +127,8 @@
         }
 
         function updatePipes() {
-            if (frames % 100 === 0) {
-                const minHeight = 50;
+            if (frames % 120 === 0) {    // Spawn less frequently (was 100)
+                const minHeight = 60;
                 const maxHeight = canvas.height - pipeGap - minHeight;
                 const topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
                 
@@ -197,6 +197,11 @@
             ctx.font = '20px Arial';
             ctx.fillText('Press SPACE or Click to jump', canvas.width / 2, canvas.height / 2 + 10);
             ctx.fillText('Avoid the green pipes!', canvas.width / 2, canvas.height / 2 + 45);
+            
+            // Auto-start after 3 seconds for easier onboarding
+            if (frames > 180) {
+                startGame();
+            }
         }
 
         function drawGameOver() {
@@ -259,7 +264,7 @@
                 frames++;
             } else if (gameState === 'start') {
                 drawBackground();
-                bird.y = 150 + Math.sin(frames * 0.05) * 20;
+                bird.y = 150 + Math.sin(frames * 0.03) * 20; // Slower bobbing
                 bird.draw();
                 drawStartScreen();
                 drawScore();
