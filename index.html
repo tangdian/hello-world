@@ -574,6 +574,9 @@
                 } else if (state.current === 'start') {
                     // Click in center area starts game
                     startGame();
+                } else if (state.current === 'playing') {
+                    // Any click during playing makes bird jump
+                    bird.jump();
                 } else if (state.current === 'gameover') {
                     resetGame();
                 }
