@@ -42,21 +42,21 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Game variables - EASIER SETTINGS
+        // Game variables
         let frames = 0;
         let score = 0;
         let highScore = localStorage.getItem('flappyHighScore') || 0;
         let gameState = 'start'; // start, playing, gameover
 
-        // Bird object - TUNED FOR BETTER GAMEPLAY
+        // Bird object - OPTIMIZED PHYSICS
         const bird = {
             x: 50,
             y: 150,
             width: 32,
             height: 24,
             velocity: 0,
-            gravity: 0.35,      // Lighter gravity for easier gameplay
-            jump: -7,           // Stronger initial jump
+            gravity: 0.4,
+            jump: -7,
             
             draw() {
                 ctx.fillStyle = '#FFD700';
@@ -106,11 +106,11 @@
             }
         };
 
-        // Pipes - WIDER GAP for easier gameplay
+        // Pipes - OPTIMIZED SETTINGS
         const pipes = [];
         const pipeWidth = 65;
-        const pipeGap = 170;      // Wider gap (was 150)
-        const pipeSpeed = 2.5;    // Slower speed (was 3)
+        const pipeGap = 170;      // Wider gap for easier gameplay
+        const pipeSpeed = 2.5;    // Slower speed
 
         function drawPipe(pipe) {
             ctx.fillStyle = '#2ECC71';
@@ -127,7 +127,7 @@
         }
 
         function updatePipes() {
-            if (frames % 120 === 0) {    // Spawn less frequently (was 100)
+            if (frames % 120 === 0) {    // Spawn every 120 frames (~2 seconds)
                 const minHeight = 60;
                 const maxHeight = canvas.height - pipeGap - minHeight;
                 const topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
