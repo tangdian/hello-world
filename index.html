@@ -404,33 +404,44 @@
             ctx.font = 'bold 24px Arial';
             ctx.fillText('ULTIMATE 🦐', canvas.width / 2, canvas.height / 2 - 60);
 
+            // Mobile instructions
             ctx.fillStyle = 'white';
-            ctx.font = '18px Arial';
-            ctx.fillText('Press SPACE or Click to start', canvas.width / 2, canvas.height / 2 + 30);
-            
-            // Difficulty selector
             ctx.font = '16px Arial';
-            ctx.fillText('Difficulty:', canvas.width / 2, canvas.height / 2 - 15);
+            ctx.fillText('Tap LEFT side to change difficulty', canvas.width / 2, canvas.height / 2 + 5);
+            ctx.fillText('Tap RIGHT side to change skin', canvas.width / 2, canvas.height / 2 + 30);
+            ctx.fillText('Tap CENTER to start game', canvas.width / 2, canvas.height / 2 + 55);
+            
+            // Difficulty selector (left half)
+            ctx.font = '16px Arial';
+            ctx.fillStyle = selectedOption === 'difficulty' ? '#FFD700' : 'rgba(255,255,255,0.7)';
+            ctx.fillText('🎮 DIFFICULTY', 30, canvas.height / 2 - 10);
             
             const diffs = ['easy', 'medium', 'hard'];
             const currentDiffIdx = diffs.indexOf(state.difficulty);
             diffs.forEach((d, i) => {
-                const x = canvas.width / 2 + (i - 1) * 60;
-                ctx.fillStyle = i === currentDiffIdx ? '#FFD700' : 'rgba(255,255,255,0.5)';
-                ctx.fillText(d.toUpperCase(), x, canvas.height / 2 + 10);
+                const x = 60 + (i * 70);
+                ctx.fillStyle = i === currentDiffIdx ? '#2ECC71' : 'rgba(255,255,255,0.4)';
+                ctx.font = 'bold 18px Arial';
+                ctx.fillText(d.toUpperCase(), x, canvas.height / 2 + 15);
             });
             
-            // Skin selector
-            ctx.font = '16px Arial';
-            ctx.fillText('Skin:', canvas.width / 2, canvas.height / 2 + 40);
+            // Skin selector (right half)
+            ctx.fillStyle = selectedOption === 'skin' ? '#FFD700' : 'rgba(255,255,255,0.7)';
+            ctx.fillText('🎨 SKIN', canvas.width - 100, canvas.height / 2 - 10);
             
             const skins = state.unlockedSkins;
             skins.forEach((skin, i) => {
-                const x = canvas.width / 2 + (i - Math.floor(skins.length/2)) * 50;
+                const x = canvas.width - 130 + (i * 50);
                 ctx.fillStyle = birdSkins[skin].body;
                 ctx.beginPath();
-                ctx.arc(x, canvas.height / 2 + 65, 12, 0, Math.PI * 2);
+                ctx.arc(x, canvas.height / 2 + 15, 14, 0, Math.PI * 2);
                 ctx.fill();
+                // Border for selected
+                if (i === skinIndex) {
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
             });
         }
 
@@ -506,33 +517,66 @@
 
         // Input handler with difficulty and skin cycling
         let skinIndex = 0;
+        let selectedOption = 'difficulty'; // 'difficulty' or 'skin'
         
         function handleInput(e) {
-            if (e.type === 'keydown' && e.code !== 'Space' && e.code !== ' ') return;
-
-            switch (state.current) {
-                case 'start':
+            if (e.type === 'keydown') {
+                switch (state.current) {
+                    case 'start':
+                        if (e.code === 'Space' || e.code === 'Enter') {
+                            startGame();
+                        } else if (e.code === 'ArrowRight') {
+                            const diffs = ['easy', 'medium', 'hard'];
+                            const idx = diffs.indexOf(state.difficulty);
+                            state.difficulty = diffs[(idx + 1) % 3];
+                        } else if (e.code === 'ArrowLeft') {
+                            skinIndex = (skinIndex - 1 + state.unlockedSkins.length) % state.unlockedSkins.length;
+                            state.currentSkin = state.unlockedSkins[skinIndex];
+                        }
+                        break;
+                    case 'playing':
+                        bird.jump();
+                        break;
+                    case 'gameover':
+                        if (e.code === 'Space' || e.code === 'Enter') {
+                            resetGame();
+                        } else if (e.code === 'ArrowRight') {
+                            const diffs = ['easy', 'medium', 'hard'];
+                            const idx = diffs.indexOf(state.difficulty);
+                            state.difficulty = diffs[(idx + 1) % 3];
+                        } else if (e.code === 'ArrowLeft') {
+                            skinIndex = (skinIndex - 1 + state.unlockedSkins.length) % state.unlockedSkins.length;
+                            state.currentSkin = state.unlockedSkins[skinIndex];
+                        }
+                        break;
+                }
+            } else if (e.type === 'click' || e.type === 'touchstart') {
+                // On mobile, clicking on options cycles them
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX !== undefined ? e.clientX : e.touches[0].clientX;
+                const y = e.clientY !== undefined ? e.clientY : e.touches[0].clientY;
+                
+                // Check if clicked in option area (bottom half of screen)
+                if (state.current === 'start' && y > canvas.height / 2 + 30) {
+                    const clickX = x - rect.left;
+                    
+                    // Determine which option was clicked
+                    if (clickX < canvas.width / 2) {
+                        // Left side: difficulty
+                        const diffs = ['easy', 'medium', 'hard'];
+                        const idx = diffs.indexOf(state.difficulty);
+                        state.difficulty = diffs[(idx + 1) % 3];
+                    } else {
+                        // Right side: skin
+                        skinIndex = (skinIndex - 1 + state.unlockedSkins.length) % state.unlockedSkins.length;
+                        state.currentSkin = state.unlockedSkins[skinIndex];
+                    }
+                } else if (state.current === 'start') {
+                    // Click in center area starts game
                     startGame();
-                    break;
-                case 'playing':
-                    bird.jump();
-                    break;
-                case 'gameover':
+                } else if (state.current === 'gameover') {
                     resetGame();
-                    break;
-            }
-            
-            // Cycle difficulty on right arrow or click after game over
-            if (e.type === 'keydown' && e.code === 'ArrowRight') {
-                const diffs = ['easy', 'medium', 'hard'];
-                const idx = diffs.indexOf(state.difficulty);
-                state.difficulty = diffs[(idx + 1) % 3];
-            }
-            
-            // Cycle skin on left arrow or click after game over
-            if (e.type === 'keydown' && e.code === 'ArrowLeft') {
-                skinIndex = (skinIndex - 1 + state.unlockedSkins.length) % state.unlockedSkins.length;
-                state.currentSkin = state.unlockedSkins[skinIndex];
+                }
             }
         }
 
