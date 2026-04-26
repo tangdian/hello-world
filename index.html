@@ -465,6 +465,8 @@
             
             // Explosion effect at death position
             createParticles(bird.x + bird.width/2, bird.y + bird.height/2, '#FFD700', 30);
+            updateParticles();
+            drawParticles();
 
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
