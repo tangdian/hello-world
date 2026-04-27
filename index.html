@@ -156,6 +156,10 @@
             },
             
             update() {
+                if (state.deathFrame !== null) {
+                    this.y = canvas.height - 20 - this.height;
+                    return;
+                }
                 this.velocity += this.gravity;
                 this.y += this.velocity;
                 
@@ -250,6 +254,8 @@
         }
 
         function updatePipes() {
+            if (state.deathFrame !== null) return;
+            
             const settings = getPipeSettings();
             
             if (state.frames % settings.spawnRate === 0) {
@@ -483,11 +489,10 @@
             ctx.fillText(`Best: ${state.highScore}`, canvas.width / 2, canvas.height / 2 + 20);
 
             // New skin unlocked message
-            if (state.score > state.highScore - 5 && state.score < state.highScore) {
-                const newSkin = skins => skins.length;
+            if (state.score >= state.highScore && state.unlockedSkins.length > 3) {
                 ctx.font = '18px Arial';
                 ctx.fillStyle = '#FFD700';
-                ctx.fillText('🎉 New skin unlocked! 🎉', canvas.width / 2, canvas.height / 2 + 60);
+                ctx.fillText('🎉 All skins unlocked! 🎉', canvas.width / 2, canvas.height / 2 + 60);
             }
 
             ctx.font = '19px Arial';
@@ -517,7 +522,10 @@
                 drawStartScreen();
             } else if (state.current === 'gameover') {
                 drawGameOver();
-                playSound('win');
+                if (!winSoundPlayed) {
+                    playSound('win');
+                    winSoundPlayed = true;
+                }
             }
 
             requestAnimationFrame(gameLoop);
@@ -532,6 +540,7 @@
             bird.y = 250;
             bird.velocity = 0;
             particles = [];
+            winSoundPlayed = false;
         }
 
         function resetGame() {
@@ -544,6 +553,7 @@
         // Input handler with difficulty and skin cycling
         let skinIndex = 0;
         let selectedOption = 'difficulty'; // 'difficulty' or 'skin'
+        let winSoundPlayed = false;
         
         function handleInput(e) {
             if (e.type === 'keydown') {
@@ -593,8 +603,8 @@
                         const idx = diffs.indexOf(state.difficulty);
                         state.difficulty = diffs[(idx + 1) % 3];
                     } else {
-                        // Right side: skin
-                        skinIndex = (skinIndex - 1 + state.unlockedSkins.length) % state.unlockedSkins.length;
+                        // Right side: skin (cycle forward)
+                        skinIndex = (skinIndex + 1) % state.unlockedSkins.length;
                         state.currentSkin = state.unlockedSkins[skinIndex];
                     }
                 } else if (state.current === 'start') {
