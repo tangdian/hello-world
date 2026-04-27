@@ -1,19 +1,20 @@
-# TOOLS.md - Local Notes for Flappy Bird Ultimate 🦐
+# TOOLS.md - Local Notes for Tank Battle (坦克大战)
 
 **Auto-Push Rule:**
 - After any edit to `index.html` → auto git add && commit && push
 - No need to say "push" - I'll do it automatically!
 
 **Game Features:**
-- 4 bird skins (unlock at scores: 5/10/15)
-- 3 difficulty levels (easy/medium/hard)
-- Sound effects (jump/score/hit/win)
-- Particle effects on death
-- Day/night cycle background
-- Mobile-friendly tap zones
+- Arrow keys: Move tank, Space: Shoot
+- 4 enemy types: Basic (red), Fast (orange), Armored (purple, 2HP), Hybrid (teal)
+- Destructible brick walls, indestructible steel walls
+- Water tiles block movement but not bullets
+- Grass provides visual cover
+- Protect the Eagle base at bottom center
+- 5 waves with increasing difficulty
+- Score tracking and lives system
 
-**Mobile Controls:**
-- Left side tap = change difficulty
-- Right side tap = change skin  
-- Center tap = start game
-- During play = any tap to jump
+**Controls:**
+- Arrow Keys: Move in direction
+- Space: Shoot
+- Enter: Start game / Next wave / Restart
