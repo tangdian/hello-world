@@ -233,9 +233,9 @@
         
         function getPipeSettings() {
             switch(state.difficulty) {
-                case 'hard': return { gap: 160, speed: 1.8, spawnRate: 90 };
-                case 'medium': return { gap: 185, speed: 1.4, spawnRate: 110 };
-                default: return { gap: 210, speed: 1.0, spawnRate: 130 }; // easy
+                case 'hard': return { gap: 180, speed: 1.5, spawnRate: 100 };
+                case 'medium': return { gap: 210, speed: 1.1, spawnRate: 130 };
+                default: return { gap: 240, speed: 0.8, spawnRate: 160 }; // easy
             }
         }
 
